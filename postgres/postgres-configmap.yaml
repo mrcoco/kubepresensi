@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: presensidb
+  POSTGRES_USER: presensiPostgres
+  POSTGRES_PASSWORD: Pr353ns14dm1nP05t9r35

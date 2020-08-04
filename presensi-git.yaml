@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: presensi
+  name: git-server
+spec:
+  initContainers:
+    - name: git-clone
+      image: alpine/git # Any image with git will do
+      command:
+        - /usr/local/git/git-clone.sh
+      args:
+        - "https://somewhere/me/my-git-repository.git"
+        - "22f1d8406d464b0c0874075539c1f2e96c253775"
+        - "/mypath"
+      volumeMounts:
+        - name: git-clone
+          mountPath: /usr/local/git
+        - name: git-repo
+          mountPath: /mypath
+  containers:
+    - image: nginx
+      name: nginx
+      volumeMounts:
+        - mountPath: /mypath
+          name: git-volume
+  volumes:
+    - name: git-volume
+      emptyDir: {}
+    - name: git-clone
+      configMap:
+        name: git-clone
+        defaultMode: 0755

@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: presensi
+  name: nginx-presensi
+spec:
+  selector:
+    matchLabels:
+      run: nginx-presensi
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: nginx-presensi
+    spec:
+      containers:
+      - name: nginx-presensi
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name: presensi-pv-storage
+            mountPath: /var/www/html
+
+      volumes:
+        - name: presensi-pv-storage
+          persistentVolumeClaim:
+            claimName: presensi-pv-claim
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: presensi
+  name: phpfpm-presensi
+spec:
+  selector:
+    matchLabels:
+      run: phpfpm-presensi
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: phpfpm-presensi
+    spec:
+      initContainers:
+      - name: git-clone
+        image: alpine/git # Any image with git will do
+        command:
+          - /usr/local/git/git-clone.sh
+        args:
+          - "https://github.com/mrcoco/vokuro-modular.git"
+          #- "22f1d8406d464b0c0874075539c1f2e96c253775"
+          - "/repo"
+        volumeMounts:
+          - name: git-clone
+            mountPath: /usr/local/git
+          - name: git-repo
+            mountPath: /repo
+      containers:
+      - name: phpfpm-presensi
+        image: akel/phalcon:3.4.5-fpm
+        ports:
+          - containerPort: 9000
+            name: transport
+            protocol: TCP
+        volumeMounts:
+          - name: presensi-pv-storage
+            mountPath: /var/www/html
+          - name: git-repo
+            mountPath: /var/www/html/repo
+
+      volumes:
+        - name: git-repo
+          emptyDir: {}
+        - name: git-clone
+          configMap:
+            name: git-clone
+            defaultMode: 0755
+        - name: presensi-pv-storage
+          persistentVolumeClaim:
+            claimName: presensi-pv-claim

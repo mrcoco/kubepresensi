@@ -1,0 +1,30 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: presensi
+  name: presensi-mongo-pvc
+  labels:
+    role: mongo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  namespace: presensi
+  name: presensi-mongo-pv
+  labels:
+    type: local
+    role: mongo
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/v0"

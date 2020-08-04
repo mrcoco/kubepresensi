@@ -1,0 +1,31 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  namespace: presensi
+  name: presensi-pv-volume
+  labels:
+    type: local
+    app: presensi
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/presensi"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: presensi
+  name: presensi-pv-claim
+  labels:
+    app: presensi
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
