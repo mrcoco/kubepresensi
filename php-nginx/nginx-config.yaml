@@ -6,7 +6,8 @@ metadata:
 data:
   presensi.conf: |-
     server {
-        root /var/www/html/public;
+        root /var/www/html/app/public;
+        error_log /var/log/nginx/presensi-error.log;
 
         location / {
             # try to serve file directly, fallback to index.php
@@ -14,7 +15,7 @@ data:
         }
 
         location ~ ^/index\.php(/|$) {
-            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_pass phpfpm-presensi:9000;
             fastcgi_split_path_info ^(.+\.php)(/.*)$;
             include fastcgi_params;
 
