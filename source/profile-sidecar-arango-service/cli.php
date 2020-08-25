@@ -53,7 +53,11 @@ while (true) {
     $message = $consumer->consume(120*1000);
     switch ($message->err) {
         case RD_KAFKA_RESP_ERR_NO_ERROR:
-            var_dump($message);
+            //var_dump($message);
+            $payload = json_decode($message->payload);
+            if($payload->dataUp){
+                print_r($payload->dataUp);
+            }
             break;
         case RD_KAFKA_RESP_ERR__PARTITION_EOF:
             echo "No more messages; will wait for more\n";
